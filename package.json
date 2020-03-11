@@ -1,0 +1,24 @@
+{
+  "name": "chopstick-simple-session",
+  "version": "1.0.0",
+  "description": "一个简单的会话管理",
+  "main": "src/index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daGaiGuanYu/chopstick-simple-session.git"
+  },
+  "keywords": [
+    "session",
+    "chopstick"
+  ],
+  "author": "gy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/daGaiGuanYu/chopstick-simple-session/issues"
+  },
+  "homepage": "https://github.com/daGaiGuanYu/chopstick-simple-session#readme",
+  "dependencies": {
+    "simple-unique-string": "^1.0.0"
+  }
+}
