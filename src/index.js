@@ -1,6 +1,8 @@
 // 由于会话是放在内存中管理的，因此程序重启后，会话全部失效
 // 改进方案：redis
 
+const Chopstick = require('chopstick') // 依赖 chopstick 没毛病
+const QueryString = require('querystring')
 const getUniqueString = require('simple-unique-string')
 const pool = {}
 const expire = 2*60*60*1000
@@ -46,11 +48,24 @@ function drop(token){
     console.log(`用户[${userid}] 注销登录`)
     return true
   }catch(e){
-    console.log('登录态都没了，还注什么销')
+    console.error('登录态都没了，还注什么销')
     return false
   }
 }
 
+function loadLoginGlove(fn, ctx){
+  let cookieObj = QueryString.parse(ctx.request.headers.cookie)
+  let token = cookieObj.token
+  
+  let userSession = get(token)
+  if(userSession){
+    ctx.sessionData = userSession
+    return fn(ctx)
+  }else{
+    throw Chopstick.CommonError.NotLogin
+  }
+}
+
 module.exports = {
-  put, get, drop, refill
+  put, get, drop, refill, loadLoginGlove
 }

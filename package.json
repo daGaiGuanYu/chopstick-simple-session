@@ -1,6 +1,6 @@
 {
   "name": "chopstick-simple-session",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "一个简单的会话管理",
   "main": "src/index.js",
   "scripts": {},
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/daGaiGuanYu/chopstick-simple-session#readme",
   "dependencies": {
+    "chopstick": "^1.3.9",
     "simple-unique-string": "^1.0.0"
   }
 }
