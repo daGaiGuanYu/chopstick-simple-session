@@ -20,6 +20,11 @@ function getExpire(){
  * @param {http.ServerResponse} response
  */
 function put(id, response){
+  if(!(response instanceof http.ServerResponse)){
+    console.error('session.put 的第二个参数是 http.ServerResponse 类型')
+    throw Chopstick.CommonError.Unknown
+  }
+
   console.log(`用户[${id}]登录成功，放入会话池`)
   let token = getUniqueString()
   let timeoutID = setTimeout( () => {
@@ -37,6 +42,11 @@ function put(id, response){
 
 /** @param {http.IncomingMessage} request */
 function get(request){
+  if(!(request instanceof http.IncomingMessage)){
+    console.error('session.get 的参数是 http.IncomingMessage 类型')
+    throw Chopstick.CommonError.Unknown
+  }
+
   let token = getTokenFromRequest(request)
   if(!token) return
 
@@ -49,6 +59,11 @@ function get(request){
 
 /** @param {http.IncomingMessage} request */
 function refill(request){
+  if(!(request instanceof http.IncomingMessage)){
+    console.error('session.refill 的参数是 http.IncomingMessage 类型')
+    throw Chopstick.CommonError.Unknown
+  }
+
   let token = getTokenFromRequest(request)
   if(!token) return true // true 是“真”错了
   
@@ -66,6 +81,15 @@ function refill(request){
  * @param {http.ServerResponse} response
  */
 function drop(request, response){
+  if(!(request instanceof http.IncomingMessage)){
+    console.error('session.drop 的第一个参数是 http.IncomingMessage 类型')
+    throw Chopstick.CommonError.Unknown
+  }
+  if(!(response instanceof http.ServerResponse)){
+    console.error('session.drop 的第二个参数是 http.ServerResponse 类型')
+    throw Chopstick.CommonError.Unknown
+  }
+
   let token = getTokenFromRequest(request)
   if(!token) return true // “真“错了
 
