@@ -7,7 +7,13 @@ const getUniqueString = require('simple-unique-string')
 const pool = {}
 const expire = 2*60*60*1000
 
-function put(id){
+function getExpire(){
+  let result = new Date()
+  result.setTime(result.getTime() + expire)
+  return result.toGMTString()
+}
+
+function put(id, response){
   console.log(`用户[${id}]登录成功，放入会话池`)
   let token = getUniqueString()
   let timeoutID = setTimeout( () => {
@@ -18,10 +24,13 @@ function put(id){
     id,
     timeoutID
   }
+
+  response.setHeader('Set-Cookie', `token=${token};path=/;httpOnly;expires=${getExpire()}`)
   return token
 }
 
-function get(token){
+function get(request){
+  let token = getTokenFromRequest(request)
   let result = pool[token]
   // 没有会话
   if(result){
@@ -30,7 +39,8 @@ function get(token){
   }
 }
 
-function refill(token){
+function refill(request){
+  let token = getTokenFromRequest(request)
   let session = pool[token]
   if(session){
     clearTimeout(session.timeoutID)
@@ -41,11 +51,13 @@ function refill(token){
     return true // true 代表“真错了“
 }
 
-function drop(token){
+function drop(request, response){
+  let token = getTokenFromRequest(request)
   try{
     let userid = pool[token].id
     delete pool[token]
     console.log(`用户[${userid}] 注销登录`)
+    response.setHeader('Set-Cookie', `token=haha;path=/;httpOnly;expires=${new Date().toGMTString()}`)
     return true
   }catch(e){
     console.error('登录态都没了，还注什么销')
@@ -54,9 +66,7 @@ function drop(token){
 }
 
 function loadLoginGlove(fn, ctx){
-  let cookieObj = QueryString.parse(ctx.request.headers.cookie)
-  let token = cookieObj.token
-  
+  let token = getTokenFromRequest(ctx.request)
   let userSession = get(token)
   if(userSession){
     ctx.sessionData = userSession
@@ -64,6 +74,11 @@ function loadLoginGlove(fn, ctx){
   }else{
     throw Chopstick.CommonError.NotLogin
   }
+}
+
+function getTokenFromRequest(request){
+  let cookieObj = QueryString.parse(request.headers.cookie)
+  return cookieObj.token
 }
 
 module.exports = {
