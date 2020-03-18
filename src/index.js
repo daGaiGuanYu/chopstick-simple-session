@@ -38,25 +38,27 @@ function put(id, response){
 /** @param {http.IncomingMessage} request */
 function get(request){
   let token = getTokenFromRequest(request)
+  if(!token) return
+
   let result = pool[token]
-  // 没有会话
-  if(result){
-    refill(request)
-    return result
-  }
+  if(!result) return
+
+  refill(request)
+  return result
 }
 
 /** @param {http.IncomingMessage} request */
 function refill(request){
   let token = getTokenFromRequest(request)
+  if(!token) return true // true 是“真”错了
+  
   let session = pool[token]
-  if(session){
-    clearTimeout(session.timeoutID)
-    session.timeoutID = setTimeout( () => {
-      delete pool[token]
-    }, expire)
-  }else
-    return true // true 代表“真错了“
+  if(!session) return true
+
+  clearTimeout(session.timeoutID)
+  session.timeoutID = setTimeout( () => {
+    delete pool[token]
+  }, expire)
 }
 
 /**
@@ -65,23 +67,21 @@ function refill(request){
  */
 function drop(request, response){
   let token = getTokenFromRequest(request)
-  try{
-    let userid = pool[token].id
-    delete pool[token]
-    console.log(`用户[${userid}] 注销登录`)
-    response.setHeader('Set-Cookie', `token=haha;path=/;httpOnly;expires=${new Date().toUTCString()}`)
-    return true
-  }catch(e){
-    console.error('登录态都没了，还注什么销')
-    return false
-  }
+  if(!token) return true // “真“错了
+
+  let user = pool[token]
+  if(!user) return true
+
+  delete pool[token]
+  console.log(`用户[${user.id}] 注销登录`)
+  response.setHeader('Set-Cookie', `token=haha;path=/;httpOnly;expires=${new Date().toUTCString()}`)
 }
 
 /**
  * @param {function} fn 
  * @param {import('chopstick').RequestContext} ctx
  */
-function loadLoginGlove(fn, ctx){
+function loadSessionInfoGlove(fn, ctx){
   let userSession = get(ctx.req)
   if(userSession){
     ctx.sessionData = userSession
@@ -98,5 +98,5 @@ function getTokenFromRequest(req){
 }
 
 module.exports = {
-  put, get, drop, refill, loadLoginGlove
+  put, get, drop, refill, loadSessionInfoGlove
 }
