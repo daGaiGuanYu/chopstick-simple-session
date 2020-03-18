@@ -1,6 +1,8 @@
 // 由于会话是放在内存中管理的，因此程序重启后，会话全部失效
 // 改进方案：redis
 
+//@ts-check
+const http = require('http')
 const Chopstick = require('chopstick') // 依赖 chopstick 没毛病
 const QueryString = require('querystring')
 const getUniqueString = require('simple-unique-string')
@@ -10,9 +12,13 @@ const expire = 2*60*60*1000
 function getExpire(){
   let result = new Date()
   result.setTime(result.getTime() + expire)
-  return result.toGMTString()
+  return result.toUTCString()
 }
 
+/**
+ * @param {string|number} id
+ * @param {http.ServerResponse} response
+ */
 function put(id, response){
   console.log(`用户[${id}]登录成功，放入会话池`)
   let token = getUniqueString()
@@ -29,16 +35,18 @@ function put(id, response){
   return token
 }
 
+/** @param {http.IncomingMessage} request */
 function get(request){
   let token = getTokenFromRequest(request)
   let result = pool[token]
   // 没有会话
   if(result){
-    refill(token)
+    refill(request)
     return result
   }
 }
 
+/** @param {http.IncomingMessage} request */
 function refill(request){
   let token = getTokenFromRequest(request)
   let session = pool[token]
@@ -51,13 +59,17 @@ function refill(request){
     return true // true 代表“真错了“
 }
 
+/**
+ * @param {http.IncomingMessage} request 
+ * @param {http.ServerResponse} response
+ */
 function drop(request, response){
   let token = getTokenFromRequest(request)
   try{
     let userid = pool[token].id
     delete pool[token]
     console.log(`用户[${userid}] 注销登录`)
-    response.setHeader('Set-Cookie', `token=haha;path=/;httpOnly;expires=${new Date().toGMTString()}`)
+    response.setHeader('Set-Cookie', `token=haha;path=/;httpOnly;expires=${new Date().toUTCString()}`)
     return true
   }catch(e){
     console.error('登录态都没了，还注什么销')
@@ -65,9 +77,12 @@ function drop(request, response){
   }
 }
 
+/**
+ * @param {function} fn 
+ * @param {import('chopstick').RequestContext} ctx
+ */
 function loadLoginGlove(fn, ctx){
-  let token = getTokenFromRequest(ctx.request)
-  let userSession = get(token)
+  let userSession = get(ctx.req)
   if(userSession){
     ctx.sessionData = userSession
     return fn(ctx)
@@ -76,8 +91,9 @@ function loadLoginGlove(fn, ctx){
   }
 }
 
-function getTokenFromRequest(request){
-  let cookieObj = QueryString.parse(request.headers.cookie)
+/** @param {http.IncomingMessage} req */
+function getTokenFromRequest(req){
+  let cookieObj = QueryString.parse(req.headers.cookie)
   return cookieObj.token
 }
 
