@@ -16,23 +16,23 @@ function getExpire(){
 }
 
 /**
- * @param {string|number} id
+ * @param {any} userinfo
  * @param {http.ServerResponse} response
  */
-function put(id, response){
+function put(userinfo, response){
   if(!(response instanceof http.ServerResponse)){
     console.error('session.put 的第二个参数是 http.ServerResponse 类型')
     throw Chopstick.CommonError.Unknown
   }
 
-  console.log(`用户[${id}]登录成功，放入会话池`)
+  console.log(`用户[${userinfo.id}]登录成功，放入会话池`)
   let token = getUniqueString()
   let timeoutID = setTimeout( () => {
     delete pool[token]
   }, expire)
 
   pool[token] = {
-    id,
+    userinfo,
     timeoutID
   }
 
@@ -98,7 +98,7 @@ function drop(request, response){
 
   delete pool[token]
   console.log(`用户[${user.id}] 注销登录`)
-  response.setHeader('Set-Cookie', `token=haha;path=/;httpOnly;expires=${new Date().toUTCString()}`)
+  response.setHeader('Set-Cookie', `token=heihei;path=/;httpOnly;expires=${new Date().toUTCString()}`)
 }
 
 /**
