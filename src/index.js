@@ -97,7 +97,7 @@ function drop(request, response){
   if(!user) return true
 
   delete pool[token]
-  console.log(`用户[${user.id}] 注销登录`)
+  console.log(`用户[${user.userinfo.id}] 注销登录`)
   response.setHeader('Set-Cookie', `token=heihei;path=/;httpOnly;expires=${new Date().toUTCString()}`)
 }
 

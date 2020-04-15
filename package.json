@@ -1,6 +1,6 @@
 {
   "name": "chopstick-simple-session",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "一个简单的RAM会话管理",
   "main": "src/index.js",
   "scripts": {},
