@@ -3,11 +3,12 @@
 
 //@ts-check
 const http = require('http')
+const Cookie = require('cookie')
 const Chopstick = require('chopstick') // 依赖 chopstick 没毛病
-const QueryString = require('querystring')
 const getUniqueString = require('simple-unique-string')
 const pool = {}
 const expire = 2*60*60*1000
+const tokenName = 'chopstickSessionId'
 
 function getExpire(){
   let result = new Date()
@@ -36,7 +37,7 @@ function put(userinfo, response){
     timeoutID
   }
 
-  response.setHeader('Set-Cookie', `token=${token};path=/;httpOnly;expires=${getExpire()}`)
+  response.setHeader('Set-Cookie', `${tokenName}=${token};path=/;httpOnly;expires=${getExpire()}`)
   return token
 }
 
@@ -98,7 +99,7 @@ function drop(request, response){
 
   delete pool[token]
   console.log(`用户[${user.userinfo.id}] 注销登录`)
-  response.setHeader('Set-Cookie', `token=heihei;path=/;httpOnly;expires=${new Date().toUTCString()}`)
+  response.setHeader('Set-Cookie', `${tokenName}=heihei;path=/;httpOnly;expires=${new Date().toUTCString()}`)
 }
 
 /**
@@ -117,7 +118,7 @@ function loadSessionInfoGlove(fn, ctx){
 
 /** @param {http.IncomingMessage} req */
 function getTokenFromRequest(req){
-  let cookieObj = QueryString.parse(req.headers.cookie)
+  let cookieObj = Cookie.parse(req.headers.cookie)
   return cookieObj.token
 }
 

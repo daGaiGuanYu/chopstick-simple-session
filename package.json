@@ -1,6 +1,6 @@
 {
   "name": "chopstick-simple-session",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "description": "一个简单的RAM会话管理",
   "main": "src/index.js",
   "scripts": {},
@@ -20,6 +20,7 @@
   "homepage": "https://github.com/daGaiGuanYu/chopstick-simple-session#readme",
   "dependencies": {
     "chopstick": "^2.0.0",
+    "cookie": "^0.4.0",
     "simple-unique-string": "^1.0.0"
   }
 }
