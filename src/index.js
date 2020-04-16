@@ -111,7 +111,7 @@ function loadSessionInfoGlove(fn, ctx){
     ctx.sessionData = userSession
     return fn(ctx)
   }else{
-    throw Chopstick.CommonError.NotLogin
+    return Chopstick.CommonError.NotLogin
   }
 }
 
