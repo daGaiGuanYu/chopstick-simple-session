@@ -118,7 +118,7 @@ function loadSessionInfoGlove(fn, ctx){
 
 /** @param {http.IncomingMessage} req */
 function getTokenFromRequest(req){
-  let cookieObj = Cookie.parse(req.headers.cookie)
+  let cookieObj = Cookie.parse(req.headers.cookie||'')
   return cookieObj[tokenName]
 }
 
