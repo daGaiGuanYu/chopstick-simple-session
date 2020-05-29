@@ -1,5 +1,5 @@
 // 由于会话是放在内存中管理的，因此程序重启后，会话全部失效
-// 改进方案：redis
+// 改进方案：redis || json
 
 //@ts-check
 const http = require('http')
@@ -104,7 +104,7 @@ function drop(request, response){
 
 /**
  * @param {function} fn 
- * @param {import('chopstick').RequestContext} ctx
+ * @param {import('chopstick/src/ctx/request')} ctx
  */
 function loadSessionInfoGlove(fn, ctx){
   let userSession = get(ctx.req)
@@ -112,7 +112,7 @@ function loadSessionInfoGlove(fn, ctx){
     ctx.sessionData = userSession
     return fn(ctx)
   }else{
-    return Chopstick.CommonError.NotLogin
+    return Chopstick.ExpectedError.NotLogin
   }
 }
 
