@@ -109,7 +109,19 @@ function drop(request, response){
 function loadSessionInfoGlove(fn, ctx){
   let userSession = get(ctx.req)
   if(userSession){
-    ctx.sessionData = userSession
+    Object.assign(ctx.sessionData, userSession)
+    return fn(ctx)
+  }
+}
+
+/**
+ * @param {function} fn 
+ * @param {import('chopstick/src/ctx/request')} ctx
+ */
+function checkLoginGlove(fn, ctx){
+  let userSession = get(ctx.req)
+  if(userSession){
+    Object.assign(ctx.sessionData, userSession)
     return fn(ctx)
   }else{
     return Chopstick.ExpectedError.NotLogin
@@ -123,5 +135,5 @@ function getTokenFromRequest(req){
 }
 
 module.exports = {
-  put, get, drop, refill, loadSessionInfoGlove
+  put, get, drop, refill, loadSessionInfoGlove, checkLoginGlove
 }
