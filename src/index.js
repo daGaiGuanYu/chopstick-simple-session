@@ -108,10 +108,9 @@ function drop(request, response){
  */
 function loadSessionInfoGlove(fn, ctx){
   let userSession = get(ctx.req)
-  if(userSession){
+  if(userSession)
     Object.assign(ctx.sessionData, userSession)
-    return fn(ctx)
-  }
+  return fn(ctx)
 }
 
 /**
