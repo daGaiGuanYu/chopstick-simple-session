@@ -59,7 +59,7 @@ function get(request){
 }
 
 /** @param {http.IncomingMessage} request */
-function refill(request){
+function refill(request){ // 没对前端 refill
   if(!(request instanceof http.IncomingMessage)){
     console.error('session.refill 的参数是 http.IncomingMessage 类型')
     throw Chopstick.CommonError.Unknown
